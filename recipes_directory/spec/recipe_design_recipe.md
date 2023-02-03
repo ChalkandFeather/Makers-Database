@@ -149,13 +149,13 @@ Using comments, define the method signatures (arguments and return value) and wh
 # Repository class
 # (in lib/recipes_repository.rb)
 
-class StudentRepository
+class RecipeRepository
 
   # Selecting all records
   # No arguments
   def all
     # Executes the SQL query:
-    # SELECT id, recipe, cooking_time, rating FROM recipes;
+    # sql = SELECT id, recipe, cooking_time, rating FROM recipes;
 
     #result_set = DatabaseConnection.exec_params(sql, [])
 
@@ -239,15 +239,15 @@ This is so you get a fresh table contents every time you run the test suite.
 
 # EXAMPLE
 
-# file: spec/student_repository_spec.rb
+# file: spec/recipe_repository_spec.rb
 
 def reset_recipes_table
-  seed_sql = File.read('spec/seeds_recipes.sql')
-  connection = PG.connect({ host: '127.0.0.1', dbname: 'recipes' })
+  seed_sql = File.read('spec/recipe_seeds.sql')
+  connection = PG.connect({ host: '127.0.0.1', dbname: 'recipe_directory' })
   connection.exec(seed_sql)
 end
 
-describe StudentRepository do
+describe RecipeRepository do
   before(:each) do 
     reset_recipes_table
   end
