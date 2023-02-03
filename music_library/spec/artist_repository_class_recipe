@@ -9,11 +9,11 @@ If the table is already created in the database, you can skip this step.
 
 Otherwise, follow this recipe to design and create the SQL schema for your table.
 
-In this template, we'll use an example table students
+In this template, we'll use an example table artists
 
 # EXAMPLE
 
-Table: students
+Table: artists
 
 Columns:
 id | name | cohort_name
@@ -34,13 +34,16 @@ If seed data is provided (or you already created it), you can skip this step.
 -- so we can start with a fresh state.
 -- (RESTART IDENTITY resets the primary key)
 
-TRUNCATE TABLE students RESTART IDENTITY; -- replace with your own table name.
+TRUNCATE TABLE artists RESTART IDENTITY; -- replace with your own table name.
 
 -- Below this line there should only be `INSERT` statements.
 -- Replace these statements with your own seed data.
 
-INSERT INTO students (name, cohort_name) VALUES ('David', 'April 2022');
-INSERT INTO students (name, cohort_name) VALUES ('Anna', 'May 2022');
+INSERT INTO artists (name, genre) VALUES('Pixies', 'Rock');
+INSERT INTO artists (name, genre) VALUES('ABBA', 'Pop');
+
+#INSERT INTO artists (name, cohort_name) VALUES ('David', 'April 2022');
+#INSERT INTO artists (name, cohort_name) VALUES ('Anna', 'May 2022');
 
 Run this SQL file on the database to truncate (empty) the table, and insert the seed data. Be mindful of the fact any existing records in the table will be deleted.
 
@@ -53,7 +56,7 @@ psql -h 127.0.0.1 your_database_name < seeds_{table_name}.sql
 Usually, the Model class name will be the capitalised table name (single instead of plural). The same name is then suffixed by Repository for the Repository class name.
 
 # EXAMPLE
-# Table name: students
+# Table name: artists
 
 # Model class
 # (in lib/artist.rb)
@@ -65,12 +68,30 @@ end
 class ArtistRepository
 end
 
+#selecting all record
+#no arguements
+def all
+#executes the SQL query
+#SELECT id,name genre FROM artists;
+
+#returns an array of Artist objects
+end
+
+##select a single recor
+#given the id in arguement(a number)
+def find(id)
+#executes the SQL query
+#SELECT id,name genre FROM artists WHERE id = $1;
+end
+#returns a single artist
+end
+
 4. Implement the Model class
 
 Define the attributes of your Model class. You can usually map the table columns to the attributes of the class, including primary and foreign keys.
 
 # EXAMPLE
-# Table name: students
+# Table name: artists
 
 # Model class
 # (in lib/student.rb)
@@ -100,7 +121,8 @@ Using comments, define the method signatures (arguments and return value) and wh
 # Table name: artists
 
 # Repository class
-# (in lib/artist_repository.rb)
+'
+(in lib/artist_repository.rb)
 
 class ArtistRepository
 
@@ -113,6 +135,14 @@ class ArtistRepository
     # Returns an array of Artists objects.
   end
 
+  def find(id)
+  #executes teh SQL
+  #SELECT id, name, genre FROM artists WHERE id = $1
+  end
+  #returns single artist
+  return artist
+  end
+
 
 6. Write Test Examples
 
@@ -123,16 +153,43 @@ These examples will later be encoded as RSpec tests.
 # EXAMPLES
 
 # 1
-# Get all artists
+it 'Gets all artists' do
 
 repo = ArtistRepository.new
 
 artists = repo.all
+
 artists.length # => 2
 artists.first.id # => '1'
-artists.find.name # => 'Pixies'
+artists.first.name # => 'Pixies'
 
 # Add more examples for each method
+
+it '#finds- gets a single artist' do
+
+repo = ArtistRepository.new
+
+artists = repo.find(1)
+artists.name # => pixies
+artists.id # => '1'
+artists.genre # => 'rock'
+
+end
+end
+
+it '#finds-gets another single artist' do
+
+repo = ArtistRepository.new
+
+artists = repo.find(2)
+artists.id # => '1'
+artists.name # => ABBA
+artists.genre # => 'rock'
+
+end
+end
+
+
 
 Encode this example as a test.
 7. Reload the SQL seeds before each test run
@@ -145,15 +202,15 @@ This is so you get a fresh table contents every time you run the test suite.
 
 # file: spec/student_repository_spec.rb
 
-def reset_students_table
-  seed_sql = File.read('spec/seeds_students.sql')
-  connection = PG.connect({ host: '127.0.0.1', dbname: 'students' })
+def reset_artists_table
+  seed_sql = File.read('spec/seeds_artists.sql')
+  connection = PG.connect({ host: '127.0.0.1', dbname: 'artists' })
   connection.exec(seed_sql)
 end
 
 describe StudentRepository do
   before(:each) do 
-    reset_students_table
+    reset_artists_table
   end
 
   # (your tests will go here).
